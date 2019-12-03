@@ -1,5 +1,5 @@
-# React-Rails-Installation-Guide
-Installing React on Rails 6 for CVWO 19/20 winter assignment.
+# React on Rails Installation Guide
+Guide for installing React on Rails v6.0.0 for the CVWO 2019/2020 winter assignment.
 
 ## Introduction
 
@@ -25,7 +25,7 @@ We recommend following this [Installation Guide by GoRails](https://gorails.com/
 
 At this point, you should be able to start building a simple Rails application (without React). You might want to checkout [this introductory tutorial to Ruby on Rails](https://guides.rubyonrails.org/getting_started.html) before moving on, especially if you have no prior Rails experience.
 
-### 2. Create the Rails application
+### 2. Integrating React with Rails
 
 The following commands create a new Rails application called `my-app` in the current directory.
 
@@ -55,39 +55,44 @@ Create the Database
 ```
 rake db:create
 ```
-**At this point, you are able to create a simple Rails application without React.**
-
-### 3. Set up React
 
 Install the React Rails gem
 ```
 bundle add react-rails
 ```
 
-Generate a Rails installation
+Generate a React installation
 ```
 rails g react:install
 ```
+At this point, if everything went well, you have successfully created a React on Rails application! Before moving on however, You might want to familiarize yourself with React, especially if you have no prior React experience. Do checkout [this introductory tutorial to React](https://reactjs.org/tutorial/tutorial.html).
 
-You are now done with setup! Time to test your react components
+### 3. Creating a simple React on Rails application
 
-### 4. 
+#### Generating a basic Rails controller
 
-### 5. Generating React Components
+#### Generating React components
 
-Generate your first component:
+Generate your first React component:
 ```
 rails g react:component HelloWorld greeting:string
 ```
 
-You can also generate your component in a subdirectory:
+You can also generate a React component in a subdirectory:
 ```
 rails g react:component my_subdirectory/HelloWorld greeting:string
 ```
 
 Note: Your component is added to `app/javascript/components/` by default.
 
+
+### 4. Conclusion
+
+If you have made it this far, you are already halfway there! The rest is up to your imagination and a bit of wishful thinking. Good luck for the rest of your assignment :)
+
 ### Credit
 - GoRails: https://gorails.com/setup
 - Official documentation for the React Rails gem: https://github.com/reactjs/react-rails
 - Getting started with Rails 6 and React by Spike Burton: https://medium.com/swlh/getting-started-with-rails-6-and-react-afac8255aecd
+
+©tiuweehan 2019
