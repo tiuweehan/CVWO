@@ -67,24 +67,38 @@ rails g react:install
 ```
 At this point, if everything went well, you have successfully created a React on Rails application! Before moving on however, You might want to familiarize yourself with React, especially if you have no prior React experience. Do checkout [this introductory tutorial to React](https://reactjs.org/tutorial/tutorial.html).
 
-### 3. Creating a simple React on Rails application
+### 3. A simple React on Rails application
+
+#### Start the Rails application
+
+To start the Rails application, use the following command:
+```
+rails server
+```
+
+Now go to your browser and go to `localhost:3000`. You should see a page that looks like this:
+
 
 #### Generating a basic Rails controller
 
+Generate a controller using the following command:
+```
+rails generate controller Welcome index
+```
+This command does a few things:
+- Creates a _Controller_ file at `app/controllers/welcome_controller.rb`
+- Creates a _View_ file at `app/views/welcome/index.html.erb`
+- Adds a route called `get welcome index` to the _Routes_ file at `config/routes.rb`
+
 #### Generating React components
 
-Generate your first React component:
+The following command creates a React component called `HelloWorld`.
 ```
 rails g react:component HelloWorld greeting:string
 ```
-
-You can also generate a React component in a subdirectory:
-```
-rails g react:component my_subdirectory/HelloWorld greeting:string
-```
+This creates a _React Component_ file at `app/javascript/components/HelloWorld.js`
 
 Note: Your component is added to `app/javascript/components/` by default.
-
 
 ### 4. Conclusion
 
@@ -95,4 +109,4 @@ If you have made it this far, you are already halfway there! The rest is up to y
 - Official documentation for the React Rails gem: https://github.com/reactjs/react-rails
 - Getting started with Rails 6 and React by Spike Burton: https://medium.com/swlh/getting-started-with-rails-6-and-react-afac8255aecd
 
-©tiuweehan 2019
+© tiuweehan 2019
