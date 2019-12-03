@@ -12,9 +12,16 @@ We recommend this setup guide by GoRails: https://gorails.com/setup/.
 - For the choice of database, we recommend PostgreSQL as it is used by CVWO projects, but it is not a requirement.
 
 
-### 2. Create a new Rails app with React
+### 2. Create the Rails application
 
-- If you are using SQLite 3
+The following commands create a new Rails application called `my-app` in the current directory.
+
+- If you are using PostgreSQL
+```
+rails new my-app --webpack=react -d postgresql
+```
+
+- If you are using SQLite 3 (Rails default)
 ```
 rails new my-app --webpack=react
 ```
@@ -24,7 +31,31 @@ rails new my-app --webpack=react
 rails new my-app --webpack=react -d mysql
 ```
 
-- If you are using PostgreSQL
+Move to the application directory
 ```
-rails new my-app --webpack=react -d postgresql
+cd my-app
 ```
+
+If you setup MySQL or Postgres with a username/password, modify the config/database.yml file to contain the username/password that you specified
+
+Create the Database
+```
+rake db:create
+```
+
+### 3. Set up React
+
+Install the React Rails gem
+```
+bundle add react-rails
+```
+
+Generate a rails installation
+```
+rails g react:install
+```
+
+### Credit
+- GoRails: https://gorails.com/setup
+- Official documentation for the React Rails gem: https://github.com/reactjs/react-rails
+- Getting started with Rails 6 and React by Spike Burton: https://medium.com/swlh/getting-started-with-rails-6-and-react-afac8255aecd
