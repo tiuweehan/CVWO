@@ -78,8 +78,10 @@ rails server
 
 Now go to your browser and go to `localhost:3000`. You should see a page that looks like this:
 
+![Rails Startup Page](https://raw.githubusercontent.com/tiuweehan/React-Rails-Installation-Guide/master/assets/Rails%20Startup%20Page.png)
 
-#### Generating a basic Rails controller
+
+#### Generating a Basic Rails controller
 
 Generate a controller using the following command:
 ```
@@ -90,21 +92,43 @@ This command does a few things:
 - Creates a _View_ file at `app/views/welcome/index.html.erb`
 - Adds a route called `get welcome index` to the _Routes_ file at `config/routes.rb`
 
+Now if you were to go to your browser and go to `localhost:3000/welcome/index`, you should see a page that looks like this:
+
+![Welcome Index Page](https://raw.githubusercontent.com/tiuweehan/React-Rails-Installation-Guide/master/assets/Controller.png)
+
 #### Generating React components
 
-The following command creates a React component called `HelloWorld`.
+The following command creates a React component called `HelloWorld`:
 ```
 rails g react:component HelloWorld greeting:string
 ```
-This creates a _React Component_ file at `app/javascript/components/HelloWorld.js`
+This creates a _React Component_ file called "HelloWorld" at `app/javascript/components/HelloWorld.js`
 
 Note: Your component is added to `app/javascript/components/` by default.
 
-### 4. Conclusion
+Now go to the `app/views/welcome/index.html.erb` you created in the previous step and add the following line to the bottom of the file:
+```
+<%= react_component("HelloWorld", { greeting: "Hello from react-rails." }) %>
+```
 
-If you have made it this far, you are already halfway there! The rest is up to your imagination and a bit of wishful thinking. Good luck for the rest of your assignment :)
+Now if you were to go to your browser and go to `localhost:3000/welcome/index`, you should see a page that looks like this:
+
+![Welcome Index Page](https://raw.githubusercontent.com/tiuweehan/React-Rails-Installation-Guide/master/assets/React.png)
+
+You have successfully integrated a React component into the file!
+
+### 4. What now?
+
+If you have made it this far, you are already halfway there!
+
+Do note that the method above (embedding the React component directly into the View) is only one of many ways to integrate React with rails, though it is the simplest and most beginner friendly.
+
+The more common and cleaner way to do it (and also how we do it in CVWO) is to use Rails as a data JSON API endpoint, with React reading the data from the endpoint. [This guide](https://dev.to/able/building-and-consuming-a-json-api-with-rails-and-react-42p6) provides a tutorial on a basic setup with such a design.
+
+Now that you have a basic Rails setup, the rest is up to your imagination and a bit of wishful thinking. All the best for the rest of your assignment :)
 
 ### Credit
+
 - GoRails: https://gorails.com/setup
 - Official documentation for the React Rails gem: https://github.com/reactjs/react-rails
 - Getting started with Rails 6 and React by Spike Burton: https://medium.com/swlh/getting-started-with-rails-6-and-react-afac8255aecd
