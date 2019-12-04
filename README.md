@@ -1,7 +1,7 @@
 # React on Rails Installation Guide
 Guide for installing React on Rails 6 for the CVWO 2019/2020 winter assignment.
 
-If you face any issues during installation, please feel free to browse or post on [the forums](https://github.com/tiuweehan/CVWO-2020/issues) as other students might be facing the same problems.
+If you face any issues during installation, please feel free to browse or post on [the forums](https://github.com/tiuweehan/CVWO-2020/issues) as other applicants might have the same problems.
 
 ## Introduction
 
