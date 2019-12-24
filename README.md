@@ -55,7 +55,7 @@ If you setup MySQL or Postgres with a username/password, modify the config/datab
 
 Create the Database
 ```
-rake db:create
+rails db:create
 ```
 
 Install the React Rails gem
