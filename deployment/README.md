@@ -198,7 +198,7 @@ ssh weehan@161.35.59.43
 
 When developing Rails, you have probably noticed that your application runs on `localhost:3000` and is being served by a **puma** server. Puma is what is known as an **Application server**, as it serves the content of your application. While it can be done, developers usually do not serve content directly to the internet using Application servers. The is because there might be some stuff you want to add before serving your content to the internet, most commonly HTTPS.
 
-This is where **Web servers** come in. Web servers can add functionality between your application and the internet, such as serving static assets like images directly, HTTPS and Load balancing. The most commonly used web servers include [Nginx](https://en.wikipedia.org/wiki/Nginx) and [Apache server](https://en.wikipedia.org/wiki/Apache_HTTP_Server). In this section, we will install nginx and use it to serve our rails application, without any of the fancy stuff.
+This is where **Web servers** come in. Web servers can add functionality between your application and the internet, such as serving static assets like images directly, HTTPS and Load balancing. The most commonly used web servers include [Nginx](https://en.wikipedia.org/wiki/Nginx) and [Apache server](https://en.wikipedia.org/wiki/Apache_HTTP_Server). In this section, we will install nginx and use it to serve our rails application, albeit without any of the fancy stuff.
 
 1. Install nginx
 
@@ -285,10 +285,14 @@ It's a lot easier for humans to remember words as compared to numbers. Hence, th
 
 **HTTPS** is a protocol for sending HTTP Traffic over **SSL (Secure Sockets Layer)**. Without technical jargon, this just means that the data sent between you and the server is encrypted, so no one who gets a hold of your data (e.g. your ISP) is able to read its contents.
 
-The HTTPS protocol is based on **Public Key Infrastructure (PKI)**, an extension of Public Key Authentication.
+The HTTPS protocol is based on **Public Key Infrastructure (PKI)**, an extension of Public Key Authentication. In addition to the 2 parties (client and server), there is an additional body called the **Certificate Authority (CA)** which is trusted by both the client and server. The CA issues a **certificate** to the server, who in turn presents it to the client as proof of authenticity. These certificates form the basis of how HTTPS works. Do checkout this [video](https://www.youtube.com/watch?v=T4Df5_cojAs&t=376s) for a better understanding of how PKI works.
 
-1. [Install Certbot](https://certbot.eff.org/all-instructions)
-2. Update nginx configuration in `/etc/nginx/sites-available/app.conf`
+In this section, we will be obtain a certificate for our domain and serve it using our Nginx web server, so our website will be secured with HTTPS.
+
+1. [Install Certbot](https://certbot.eff.org/all-instructions). 
+  - `Certbot` is a free command line tool for generating SSL certificates.
+  - The certificate we will be generating is provided by [`LetsEncrypt`](https://letsencrypt.org/), a non-profit CA.
+2. Update nginx configuration in `/etc/nginx/sites-available/app.conf` to add an additional location block to the server.
 
 ```nginx
 upstream app {
@@ -298,7 +302,7 @@ upstream app {
 server {
     listen 80;
     listen [::]:80;
-    server_name hello.me
+    server_name hello.com.de
 
     # Path for certbot renewal
     location /.well-known/acme-challenge/ {
@@ -311,15 +315,23 @@ server {
     }
 }
 ```
+  - This additional block is used by Certbot for generating the certificate using the **Automatic Certificate Management Environment (ACME)** protocol, more specifically the **HTTP-01** Challenge. Read more about the ACME protocol [here](https://letsencrypt.org/docs/challenge-types/).
+
 3. Restart nginx
 ```bash
 sudo systemctl restart nginx
 ```
 
-4. Generate certificates
+4. Generate certificate for `hello.com.de`
 ```bash
-sudo certbot certonly -d hello.me
+sudo certbot certonly -d hello.com.de
 ```
+  - The newly generated certificate will be stored in the directory `/etc/letsencrypt/live/hello.com.de/`. It should contain the following 4 files:
+    - `cert.pem`: The certificate itself
+    - `chain.pem`: Additional intermediate certificate(s) that web browers need to validate the certificate. See [chain of trust](https://www.youtube.com/watch?v=LPxeYtMDxl0).
+    - `fullchain.pem`: All certificates, i.e server certificate + additional intermediate certificates.
+    - `privkey.pem`: Private key for the certificate.
+  - For purposes of authentication, having both `fullchain.pem` and `privkey.pem` is sufficient. We will be serving these files using Nginx in the next step.
 
 5. Update nginx configuration again in `/etc/nginx/sites-available/app.conf`
 ```nginx
@@ -330,7 +342,7 @@ upstream app {
 server {
     listen 80;
     listen [::]:80;
-    server_name hello.me
+    server_name hello.com.de
 
     # Path for certbot renewal
     location /.well-known/acme-challenge/ {
@@ -346,7 +358,7 @@ server {
 server {
     listen 443;
     listen [::]:443;
-    server_name hello.me
+    server_name hello.com.de
 
     # Path for certbot renewal
     location /.well-known/acme-challenge/ {
@@ -357,8 +369,8 @@ server {
 	client_max_body_size 20M;
 
 	# certs sent to the client in SERVER HELLO are concatenated in ssl_certificate
-	ssl_certificate /etc/letsencrypt/live/sacnl.nuscvwo.com/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/sacnl.nuscvwo.com/privkey.pem;
+	ssl_certificate /etc/letsencrypt/live/hello.com.de/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/hello.com.de/privkey.pem;
 	ssl_session_timeout 1d;
 	ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
 	ssl_session_tickets off;
@@ -392,13 +404,19 @@ server {
     }
 }
 ```
+  - A new server block listening at **port 443** is added.
+    - Port 443 is the default port for serving HTTPS content. For example, when you connect to https://www.google.com, you are actually connecting to port 443 of https://www.google.com, i.e. https://www.google.com:443. 
+
+  - The old server block listening at post 80 will now redirect to the https block with a status code of 301.
+
+  - Some additional headers related to SSL are added to the request before it is proxy passed to the upstream (i.e. the Application server).
 
 6. Restart nginx
 ```bash
 sudo systemctl restart nginx
 ```
 
-7. If you open your webpage now, your website should now be served securely over HTTPS. Good work!
+7. If you open your webpage now, your website should now be served securely over HTTPS. You should see a green lock when accessing your website. Good work!
 
 ## Remote Storage with AWS S3 Buckets
 
