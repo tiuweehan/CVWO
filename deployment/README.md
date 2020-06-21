@@ -14,7 +14,7 @@ This guide is meant for students who are interested in deploying their applicati
 - [Generate SSH key pair](#generate-ssh-key-pair)
 - [Create a DigitalOcean droplet](#create-a-digitalocean-droplet)
 - [Access the droplet and create a new user](#access-the-droplet-and-create-a-new-user)
-- [Install React and Rails](#install-react-and-rails)
+- [Install React, Rails and PostgreSQL](#install-react-rails-and-postgresql)
 - [Web Servers with Nginx](#web-servers-with-nginx)
 - [DNS with Namecheap](#dns-with-namecheap)
 - [HTTPS with Certbot](#https-with-certbot)
@@ -26,6 +26,7 @@ This guide is meant for students who are interested in deploying their applicati
 - [GitLab Runners](#gitlab-runners)
 - [Containerization with Docker](#containerization-with-docker)
 - [Single Host Container Orchestration with Docker-compose](#single-host-container-orchestration-with-docker-compose)
+- [Container Orchestration with Kubernetes](#container-orchestration-with-kubernetes)
 
 ## Generate SSH key pair
 
@@ -423,6 +424,8 @@ sudo systemctl restart nginx
 
 ## Shell Scripting with Bash
 
+> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=_n5ZegzieSQ) for the time being on getting started with shell scripting.
+
 ## Remote Storage with AWS S3 Buckets
 
 > This is a work in progress. Refer to [this guide](https://aws.amazon.com/getting-started/hands-on/backup-to-s3-cli/) for the time being on how to use the AWS CLI.
@@ -437,12 +440,22 @@ sudo systemctl restart nginx
 
 ## CI/CD with GitLab CI
 
+> This is a work in progress. Refer to [this guide](https://docs.gitlab.com/ee/ci/quick_start/) for the time being on getting started with GitLab CI.
+
 ## GitLab Runners
+
+> This is a work in progress. Refer to [this guide](https://docs.gitlab.com/runner/) on installing, registering and using GitLab runners.
 
 ## Containerization with Docker
 
+> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=YFl2mCHdv24) for a quick guide on docker.
+
 ## Single Host Container Orchestration with Docker-compose
 
+> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=Qw9zlE3t8Ko) for a quick guide on docker-compose.
+
 ## Container Orchestration with Kubernetes
+
+> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=gpmerrSpbHg) for learning kubernetes.
 
 © tiuweehan 2020
