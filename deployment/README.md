@@ -1,4 +1,4 @@
-# Deploy your Application on DigitalOcean
+# Operations and DevOps Guide
 
 This guide is meant for students who are interested in deploying their applications to the cloud.
 
@@ -18,11 +18,14 @@ This guide is meant for students who are interested in deploying their applicati
 - [Web Servers with Nginx](#web-servers-with-nginx)
 - [DNS with Namecheap](#dns-with-namecheap)
 - [HTTPS with Certbot](#https-with-certbot)
+- [Shell Scripting with Bash](#shell-scripting-with-bash)
 - [Remote Storage with AWS S3 Buckets](#remote-storage-with-aws-s3-buckets)
 - [Backups with Cron jobs](#backups-with-cron-jobs)
 - [Systemd services](#systemd-services)
-- [Docker](#containerization-with-docker)
-- [Docker-compose](#container-orchestration-with-docker-compose)
+- [CI/CD with GitLab CI](#cicd-with-gitlab-ci)
+- [GitLab Runners](#gitlab-runners)
+- [Containerization with Docker](#containerization-with-docker)
+- [Single Host Container Orchestration with Docker-compose](#single-host-container-orchestration-with-docker-compose)
 
 ## Generate SSH key pair
 
@@ -418,14 +421,28 @@ sudo systemctl restart nginx
 
 7. If you open your webpage now, your website should now be served securely over HTTPS. You should see a green lock when accessing your website. Good work!
 
+## Shell Scripting with Bash
+
 ## Remote Storage with AWS S3 Buckets
+
+> This is a work in progress. Refer to [this guide](https://aws.amazon.com/getting-started/hands-on/backup-to-s3-cli/) for the time being on how to use the AWS CLI.
 
 ## Backups with Cron jobs
 
+> This is a work in progress. Refer to [this guide](https://www.ostechnix.com/a-beginners-guide-to-cron-jobs/) for the time being on getting started with Cron jobs.
+
 ## Systemd services
+
+> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=fYQBvjYQ63U) for the time being on getting started with systemd services.
+
+## CI/CD with GitLab CI
+
+## GitLab Runners
 
 ## Containerization with Docker
 
-## Container Orchestration with Docker-compose
+## Single Host Container Orchestration with Docker-compose
+
+## Container Orchestration with Kubernetes
 
 © tiuweehan 2020
