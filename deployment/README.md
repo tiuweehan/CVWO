@@ -224,6 +224,235 @@ ssh weehan@161.35.59.43
 
 ## Install React, Rails and PostgreSQL
 
+_The following instructions are adapted from [this guide here](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-ruby-on-rails-application-on-ubuntu-18-04), [this guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-ruby-on-rails-with-postgres) and [this website here](https://www.theodinproject.com)._
+
+For current CVWO members, you may choose to deploy your team's Rails app on your server, much like how you set up the app during the first week of CVWO.
+
+Otherwise, below are some steps that you can follow to get a simple Rails app with PostgreSQL up and running. There will be no React app deployed at this point.
+
+1. Install PostgreSQL
+
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib libpq-dev
+```
+
+The `postgresql` package holds the main PostgreSQL program, while `postgresql-contrib` adds several PostgreSQL features that extend its capabilities. `libpq-dev` is a PostgreSQL library that allows clients to send queries and receive responses from the back-end server, which will allow your application to communicate with its database.
+
+2. Creating a new database role
+
+Upon installation, PostgreSQL actually creates a user in your server called `postgres`. A role of the same name is created as well. For you to be able to operate within the PostgreSQL system, you will need to be using a user account that has a role of the same name.
+
+You can perform the following commands, replacing `weehan` with your just created user name.
+
+```bash
+sudo su postgres
+psql -c 'CREATE ROLE weehan WITH CREATEDB LOGIN;'
+psql -c 'ALTER USER weehan WITH SUPERUSER;'
+exit # switch back to your current user
+```
+
+> Note: We did not create a password for this role as of now. However, we can easily do so via
+>
+> ```bash
+> sudo su postgres
+> psql -c '\password weehan'
+> ```
+>
+> PostgreSQL will prompt you for a password, which you can key in. Do remember this password for later.
+
+3. Installing Rails
+
+There are a few ways to go about doing this. For this guide, we'll be using `rbenv`. The following commands can be done using your user account.
+
+```bash
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+```
+
+If you don't have `git` installed, you can run:
+
+```bash
+sudo apt update
+sudo apt install git
+```
+
+before running the command above again.
+
+Then you will need to add `rbenv` into your path:
+
+```bash
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+If the `source` command does not work for you, you may have to `exit` and `ssh` in again.
+
+Now let us install `ruby-build` to help compile the Ruby binaries.
+
+```bash
+mkdir -p "$(rbenv root)"/plugins
+git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+```
+
+Finally, run
+
+```bash
+rbenv -v
+```
+
+You should see some output for the first time, which looks similar to:
+
+```bash
+rbenv 1.1.2-2-g4e92322
+```
+
+Finally, we can do the following:
+
+```bash
+rbenv install 2.7.1 --verbose
+```
+
+As this installation will take quite a while, the `--verbose` flag helps us to make sure that the installation is still running.
+
+When it's done, run
+
+```bash
+rbenv global 2.7.1
+ruby -v
+```
+
+You should see the correct ruby version.
+
+Finally, let us run the following commands:
+
+```bash
+gem install rails
+gem install pg
+```
+
+4. Creating our Rails app
+
+Let us create an app now.
+
+```bash
+rails new appname -d=postgresql
+```
+
+This creates a new Rails app that uses PostgreSQL for its database.
+
+```bash
+cd appname
+```
+
+If you had previously configured a password for your account, and you wish to configure your database securely, you can do the following steps. Else, you can skip to the final [section 5](#rails-section-5).
+
+- Save your password as an environment variable that is loaded upon login.
+
+```bash
+echo 'export APPNAME_DATABASE_PASSWORD="your_password_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Next, you will need to update the `config/database.yml` file. Update the following section:
+
+```yml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: weehan
+  password: <%= ENV['APPNAME_DATABASE_PASSWORD'] %>
+```
+
+5. <div id="rails-section-5">Starting your Rails app</div>
+
+Let us start the app.
+
+```bash
+rails db:create
+rails db:migrate
+rails s -p 8080
+```
+
+This will create our databases and have our app running on port 8080!
+
+To test if your app is working, open up a new terminal tab or window, connect to your server using `ssh` and run:
+
+```bash
+curl http://127.0.0.1:8080
+```
+
+> 127.0.0.1 is the standard address for localhost. You can read more on [Wikipedia](https://en.wikipedia.org/wiki/Localhost).
+
+If you don't have `curl`, install it using:
+
+```bash
+sudo apt update
+sudo apt install curl
+```
+
+You should get some `html` response that ends with:
+
+```html
+        <strong>Ruby version:</strong> 2.7.1 (x86_64-linux)
+      </p>
+    </section>
+  </div>
+</body>
+</html>
+```
+
+6. Scaffolding and `screen` (Optional)
+
+Currently, our app will only have a single `html` page, which is the default home screen. We may want a more elaborate app. One way is to use some default scaffold, that will allow us to interact with our PostgreSQL database.
+
+```bash
+rails g scaffold Post title:string body:text
+rake db:migrate
+```
+
+If you face issues due to `yarn`, as some scaffolds use `webpacker`, which requires `yarn` to install it, we can set everything up using the following commands:
+
+```bash
+sudo curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+sudo sh -c "echo 'deb https://dl.yarnpkg.com/debian/ stable main' >> /etc/apt/sources.list"
+sudo apt update
+sudo apt install yarn # will install node and yarn together
+rails webpacker:install
+```
+
+If you wish to install Node separately, e.g. you want to install a specific version, the following commands can be used to install Node v12.18.1:
+
+```bash
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt-get update
+sudo apt-get install git-core zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev nodejs yarn
+```
+
+We can now CRUD posts via `http://127.0.0.1:8080/posts`.
+
+If you wish to run the rails server in the background, you can also use the `screen` command (credits to [Tan Jin](https://github.com/tjtanjin)).
+
+```bash
+screen
+rails s -p 8080
+```
+
+After the Rails server is up, detach yourself from the screen using <kbd>ctrl</kbd> + <kbd>a</kbd> + <kbd>d</kbd>.
+
+To return to the screen:
+
+```
+screen -r
+```
+
+To terminate the screen, while you're attached to it, press <kbd>ctrl</kbd> + <kbd>d</kbd>.
+
 ## Web Servers with Nginx
 
 When developing Rails, you have probably noticed that your application runs on `localhost:3000` and is being served by a **puma** server. Puma is what is known as an **Application server**, as it serves the content of your application. While it can be done, developers usually do not serve content directly to the internet using Application servers. The is because there might be some stuff you want to add before serving your content to the internet, most commonly HTTPS.
