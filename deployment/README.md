@@ -7,7 +7,7 @@ This guide is meant for students who are interested in deploying their applicati
 - [Beginner's Guide to the Bash terminal](https://www.youtube.com/watch?v=oxuRxtrO2Ag)
 - [Vim Text Editor for Beginners](https://www.youtube.com/watch?v=ohk3cpBqY60&list=PLT98CRl2KxKHy4A5N70jMRYAROzzC2a6x)
 - [SSH Crash Course | With Some DevOps](https://www.youtube.com/watch?v=hQWRp-FdTpc)
-> ^ This tutorial also goes through the setup for DigitalOcean droplets.
+  > ^ This tutorial also goes through the setup for DigitalOcean droplets.
 
 ## Lesson Plan
 
@@ -32,101 +32,115 @@ This guide is meant for students who are interested in deploying their applicati
 
 > If you already have an existing SSH key pair before, feel free to skip this section.
 
-**Secure Shell (SSH)** is by far the most common way for developers to access remote servers. As these servers may be publicly accessible on the internet (e.g. DigitalOcean droplets), there has to be some form of authentication mechanism to prevent malicious parties from accessing these servers. 
+**Secure Shell (SSH)** is by far the most common way for developers to access remote servers. As these servers may be publicly accessible on the internet (e.g. DigitalOcean droplets), there has to be some form of authentication mechanism to prevent malicious parties from accessing these servers.
 
 Sure, the solution is easy - we can use passwords, right? The thing is, passwords are cumbersome and nobody likes them. Imagine having to type in your password everytime you access a website. Fortunately, Computer Scientists invented something called **Public Key Authentication**, which allows a user to access remote servers without having to key in a password every time. In this section, we will be setting up an SSH key pair using **RSA cryptography**.
 
 > We won't be going into the specifics of how Public Key Authentication works. If you are interested in how it works, you can watch [this video](https://www.youtube.com/watch?v=AQDCe585Lnc).
 
 1. Open a new terminal
-2. Run the following command. This will generate a new SSH key-pair of length 4096 bits using [RSA cryptography](https://en.wikipedia.org/wiki/RSA_(cryptosystem)). 
+2. Run the following command. This will generate a new SSH key-pair of length 4096 bits using [RSA cryptography](<https://en.wikipedia.org/wiki/RSA_(cryptosystem)>).
+
 ```bash
 ssh-keygen -t rsa -b 4096
 ```
 
 3. You will be prompted for a few things
+
 - **File to save the key:**
-By default this will be in `/home/<username>/.ssh/id_rsa`. Press Enter to continue.
+  By default this will be in `/home/<username>/.ssh/id_rsa`. Press Enter to continue.
 - **Passphrase:** This is the "password" needed to access the file. You can choose not to set one but it is not recommended.
 
 4. Your public key pair is created! Check that the following files exist by running the commands:
 
-  **Private key:**
-  > Keep this file safe and  don't share it with anyone!
-  ```bash
-  cat ~/.ssh/id_rsa
-  ```
-  The output should look something like this:
-  ```
-  -----BEGIN RSA PRIVATE KEY-----
-  MIIEowIBAAKCAQEAl3GRfqmw36t9ltk5muqFdGm+OQdLwcp+qtx1dfUDMQ0B1oBW
-  YgNUvvAnVkfei3nJnKN7GGdUx1TXHWPmAJsU915e4MiK3o1topEqLu/wfl0kg0bY
-  BLHNkGTZylHCGXZt2NqPkHfArYvjcdu7q6flDto1QJLxiKQ0Gh3LDFGnLLbraONH
-  Sy34zmOmmdyimlmRowi/aAT3NEnB+IeZgZVy4tf8z8Ra1qZkQu9gStxBSqz6/9ct
-  uJySvyhjCpfBVrofqk5XFj3dmbQU7UbLs3TghhN9qfHyMwYwpuflOReXHiZq8t9z
-  VGDAxYF2Ho7p1HJysTo80wAsN6jdKSFNNwlDlwIDAQABAoIBAA4k/ErRPITXdoZl
-  SX0PlGFYEv0ukkPKTuRUbOAUfzTQmzBWkjrbRsoCkhn74mwydsMbfb68v+1SHjlP
-  gEbkNSQZe1ERSe8ZVHkPh9oUbOjQeD2Om1Rs6t8mnDTKSA+qwP21BB2hIazT2O1k
-  cXXJ25n0hW6/irGRbJBX4gQHiE6jrjbemL0KGbthbctZGfLBvrTWRpnlIdYJ/45W
-  ejeaUTwtOjiiLVnnMCsNQ7v/B9dgyV/7zy6ko4UoLtUDD9UpYtuE4aXUXwV7FUrS
-  6hNXiD3ZDx4NV2eZsCxrL7OExkw01rgNP9W+FfKxjVcZ+cjL3noIMkCQPFnyU4zp
-  +FdpnZkCgYEAxobCsVPXA7llAj3TxxMVjR2GXJn8F7by0W6E2+wpzgDfi5Z/nFo6
-  AFhHWg4YCrvz8xbh7zHPXP738CNkxlocmKWwkxOdmq3eFHtIqUvlNyNxcO0Qpq2q
-  IEdLknvgHx+rKxMAxf2oJeO1msEGb4KRK3xy7i5ONBbTQBz2gIgvT3MCgYEAw0ll
-  kZcHCu9497j4XeW3Izy81iVqH44+PS/hV6g39RQ5AC5rbmQks8n5a9tetwV5eExy
-  n5RRaAfi/h/fwjkqjfbzdFld2jO5x9INUgfNaQDhKZdYbicreY3vi+HKxx/Zxewq
-  zNT9H9joq/PKcBUqyr6O1X3SLTxzhGdR73bEqk0CgYAJH8Bq7fN/1FF0HOtSxunC
-  poy6TMltPZdDUNUCVoRFV3zuqWgMA4mO4n/E/8jTFXhMv8x6dcuV9pHmk3naM+IE
-  kfjfiZNAvKTsRA4+2aIbOqHIEt0lC+45tY0fmlnelFIFlMYAU3wa4bBDAIQPM+0A
-  FqQhljc55aKn26zok1m5SQKBgQC2YNR3bHmKT+1ERL3HS2KGiRG+WMDMaZZcpFup
-  9pMT0egN8Ewqk2Hnemfyv7Or73Pq0lJ2EBkas8rdE71v8N16Kbhh35gT0RzerZ/9
-  DQZb2xNtOUe/z9r9MX4WwC8VWfySqCWsl/kxhex9sjdMB6ioIeDZJyFjV8J2U9uk
-  bOHsPQKBgFDQuTQZWyBgL7+uhr9EEYKomoTWq/wmHrc9e8xCEinTMNfgfe4WxYHe
-  fEFw4A19w0xoLlWj0MTn3h1hqGk8DSHDprX9VJlQWLuzXkk0S0gD2Fj/R1Qm1ucP
-  iTOe6wpCn9mEKbW2Vacd3PFLt6fOZ5mkFKSsoUqGyResnWIVSED0
-  -----END RSA PRIVATE KEY-----
+   **Private key:**
 
-  ```
+   > Keep this file safe and don't share it with anyone!
 
-  **Public key:**
-  > This file is safe to share
-  ```bash
-  cat ~/.ssh/id_rsa.pub
-  ```
-  The output should look something like
-  ```
-  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXcZF+qbDfq32W2Tma6oV0ab45B0vByn6q3HV19QMxDQHWgFZiA1S+8CdWR96Lecmco3sYZ1THVNcdY+YAmxT3Xl7gyIrejW2ikSou7/B+XSSDRtgEsc2QZNnKUcIZdm3Y2o+Qd8Cti+Nx27urp+UO2jVAkvGIpDQaHcsMUacstuto40dLLfjOY6aZ3KKaWZGjCL9oBPc0ScH4h5mBlXLi1/zPxFrWpmRC72BK3EFKrPr/1y24nJK/KGMKl8FWuh+qTlcWPd2ZtBTtRsuzdOCGE32p8fIzBjCm5+U5F5ceJmry33NUYMDFgXYejunUcnKxOjzTACw3qN0pIU03CUOX weehan@cvwo-2020
-  ```
+```bash
+cat ~/.ssh/id_rsa
+```
+
+The output should look something like this:
+
+```bash
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAl3GRfqmw36t9ltk5muqFdGm+OQdLwcp+qtx1dfUDMQ0B1oBW
+YgNUvvAnVkfei3nJnKN7GGdUx1TXHWPmAJsU915e4MiK3o1topEqLu/wfl0kg0bY
+BLHNkGTZylHCGXZt2NqPkHfArYvjcdu7q6flDto1QJLxiKQ0Gh3LDFGnLLbraONH
+Sy34zmOmmdyimlmRowi/aAT3NEnB+IeZgZVy4tf8z8Ra1qZkQu9gStxBSqz6/9ct
+uJySvyhjCpfBVrofqk5XFj3dmbQU7UbLs3TghhN9qfHyMwYwpuflOReXHiZq8t9z
+VGDAxYF2Ho7p1HJysTo80wAsN6jdKSFNNwlDlwIDAQABAoIBAA4k/ErRPITXdoZl
+SX0PlGFYEv0ukkPKTuRUbOAUfzTQmzBWkjrbRsoCkhn74mwydsMbfb68v+1SHjlP
+gEbkNSQZe1ERSe8ZVHkPh9oUbOjQeD2Om1Rs6t8mnDTKSA+qwP21BB2hIazT2O1k
+cXXJ25n0hW6/irGRbJBX4gQHiE6jrjbemL0KGbthbctZGfLBvrTWRpnlIdYJ/45W
+ejeaUTwtOjiiLVnnMCsNQ7v/B9dgyV/7zy6ko4UoLtUDD9UpYtuE4aXUXwV7FUrS
+6hNXiD3ZDx4NV2eZsCxrL7OExkw01rgNP9W+FfKxjVcZ+cjL3noIMkCQPFnyU4zp
++FdpnZkCgYEAxobCsVPXA7llAj3TxxMVjR2GXJn8F7by0W6E2+wpzgDfi5Z/nFo6
+AFhHWg4YCrvz8xbh7zHPXP738CNkxlocmKWwkxOdmq3eFHtIqUvlNyNxcO0Qpq2q
+IEdLknvgHx+rKxMAxf2oJeO1msEGb4KRK3xy7i5ONBbTQBz2gIgvT3MCgYEAw0ll
+kZcHCu9497j4XeW3Izy81iVqH44+PS/hV6g39RQ5AC5rbmQks8n5a9tetwV5eExy
+n5RRaAfi/h/fwjkqjfbzdFld2jO5x9INUgfNaQDhKZdYbicreY3vi+HKxx/Zxewq
+zNT9H9joq/PKcBUqyr6O1X3SLTxzhGdR73bEqk0CgYAJH8Bq7fN/1FF0HOtSxunC
+poy6TMltPZdDUNUCVoRFV3zuqWgMA4mO4n/E/8jTFXhMv8x6dcuV9pHmk3naM+IE
+kfjfiZNAvKTsRA4+2aIbOqHIEt0lC+45tY0fmlnelFIFlMYAU3wa4bBDAIQPM+0A
+FqQhljc55aKn26zok1m5SQKBgQC2YNR3bHmKT+1ERL3HS2KGiRG+WMDMaZZcpFup
+9pMT0egN8Ewqk2Hnemfyv7Or73Pq0lJ2EBkas8rdE71v8N16Kbhh35gT0RzerZ/9
+DQZb2xNtOUe/z9r9MX4WwC8VWfySqCWsl/kxhex9sjdMB6ioIeDZJyFjV8J2U9uk
+bOHsPQKBgFDQuTQZWyBgL7+uhr9EEYKomoTWq/wmHrc9e8xCEinTMNfgfe4WxYHe
+fEFw4A19w0xoLlWj0MTn3h1hqGk8DSHDprX9VJlQWLuzXkk0S0gD2Fj/R1Qm1ucP
+iTOe6wpCn9mEKbW2Vacd3PFLt6fOZ5mkFKSsoUqGyResnWIVSED0
+-----END RSA PRIVATE KEY-----
+
+```
+
+**Public key:**
+
+> This file is safe to share
+
+```bash
+cat ~/.ssh/id_rsa.pub
+```
+
+The output should look something like
+
+```bash
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXcZF+qbDfq32W2Tma6oV0ab45B0vByn6q3HV19QMxDQHWgFZiA1S+8CdWR96Lecmco3sYZ1THVNcdY+YAmxT3Xl7gyIrejW2ikSou7/B+XSSDRtgEsc2QZNnKUcIZdm3Y2o+Qd8Cti+Nx27urp+UO2jVAkvGIpDQaHcsMUacstuto40dLLfjOY6aZ3KKaWZGjCL9oBPc0ScH4h5mBlXLi1/zPxFrWpmRC72BK3EFKrPr/1y24nJK/KGMKl8FWuh+qTlcWPd2ZtBTtRsuzdOCGE32p8fIzBjCm5+U5F5ceJmry33NUYMDFgXYejunUcnKxOjzTACw3qN0pIU03CUOX weehan@cvwo-2020
+```
+
 5. Congratulations, you have setup your SSH key pair!
+
 ## Create a DigitalOcean droplet
 
-[DigitalOcean](https://www.digitalocean.com/about/)  is a cloud platform which provides **Infrastructure as a Service (IaaS)**. This just means you can spin up **Virtual Machines (VMs)** in the cloud that you can access using SSH. These VMs are known as **Droplets** in DigitalOcean terminology.
+[DigitalOcean](https://www.digitalocean.com/about/) is a cloud platform which provides **Infrastructure as a Service (IaaS)**. This just means you can spin up **Virtual Machines (VMs)** in the cloud that you can access using SSH. These VMs are known as **Droplets** in DigitalOcean terminology.
 
-You can think of a cloud VM as just another computer running somewhere in the world (in this case, in one of DigitalOcean's data centers). However, unlike regular computers that we use, these computers are meant to run 24/7, and are permanently conencted to the internet. Hence, this makes it very suitable for serving web applications.
+You can think of a cloud VM as just another computer running somewhere in the world (in this case, in one of DigitalOcean's data centers). However, unlike regular computers that we use, these computers are meant to run 24/7, and are permanently connected to the internet. Hence, this makes it very suitable for serving web applications.
 
 There are other companies that provide IaaS services such as Amazon ([AWS EC2](https://aws.amazon.com/ec2/)), Google ([GCP Compute Engine](https://cloud.google.com/compute)) and MicroSoft ([Azure VMs](https://azure.microsoft.com/en-us/services/virtual-machines/)), but DigitalOcean has a clean and simple UI and is very beginner friendly.
 
-> Aside from IaaS, other commonly used cloud services include Platform as a Service (PaaS) and Software as a Service (SaaS). 
-Examples of PaaS applications include Heroku and Netlify, and examples of SaaS are Google Docs and Google Sheets. Read more about the differences [here](https://www.bmc.com/blogs/saas-vs-paas-vs-iaas-whats-the-difference-and-how-to-choose/).
+> Aside from IaaS, other commonly used cloud services include Platform as a Service (PaaS) and Software as a Service (SaaS).
+> Examples of PaaS applications include Heroku and Netlify, and examples of SaaS are Google Docs and Google Sheets. Read more about the differences [here](https://www.bmc.com/blogs/saas-vs-paas-vs-iaas-whats-the-difference-and-how-to-choose/).
 
 In this section, we will create a DigitalOcean account and spin up a droplet.
 
-
-1.  Create a new [DigitalOcean](https://www.digitalocean.com/) account.
+1. Create a new [DigitalOcean](https://www.digitalocean.com/) account.
 
 > **TIP**: If you are a student, you are eligible for $50 DigitalOcean credits under the [GitHub Student Developer pack](https://education.github.com/pack). If you are feeling generous, you can also sign up with my [referral link](https://m.do.co/c/4ebee4a0ce0f), which will give you $100 (but only for 60 days).
 
-
 2. Create a new project
 3. Create a new droplet with the following configurations. For those not specified, just leave it as the default.
-- **Distro:** The latest Ubuntu version 
-- **Plan:** Starter plan that costs $5/month
+
+- **Distro:** The latest Ubuntu version
+- **Plan:** Starter plan that costs \$5/month
 - **Data Center region:** Singapore
 - **Authentication:**: Click on `New SSH key` and enter the contents in the file `~/.ssh/id_rsa.pub`. You can get its contents by running:
+
   ```bash
   cat ~/.ssh/id_rsa.pub
   ```
-  > Make sure *not* to accidentally use `~/.ssh/id_rsa`
+
+  > Make sure _not_ to accidentally use `~/.ssh/id_rsa`
+
 - **Hostname:** This can be whatever you want to name your droplet. I named mine `cvwo`.
 
 4. Click on create droplet. It should take up to a few minutes to create a droplet. Afterwards, go to the droplets page, and you will see something like this:
@@ -143,41 +157,51 @@ In this section, we will be accessing the droplet we created, and we will also c
 
 2. SSH into the droplet as the `root` user with the droplet's IP address.
 
-  ```bash
-  ssh root@161.35.59.43
-  ```
-  > If you are unable to SSH into the system, you probably made a mistake in the previous steps. Do review them again if you are having trouble.
+```bash
+ssh root@161.35.59.43
+```
 
-  - The [root user](https://en.wikipedia.org/wiki/Superuser) is a special account used for system administration. It has the privilege to do almost anything in the system. It is generally not recommended to run commands as the root user unless you know what you are doing.
+> If you are unable to SSH into the system, you probably made a mistake in the previous steps. Do review them again if you are having trouble.
+
+- The [root user](https://en.wikipedia.org/wiki/Superuser) is a special account used for system administration. It has the privilege to do almost anything in the system. It is generally not recommended to run commands as the root user unless you know what you are doing.
 
 3. Create a new user with your desired username. I will use `weehan` for subsequent examples, but this can be any username of your choice.
+
 ```bash
 adduser weehan
 ```
+
 - You will be prompted for a password and other details.
 
 4. Make yourself a `sudo` user.
+
 ```bash
 usermod -aG sudo weehan
 ```
-  - `usermod` stands for 'modify user'
-  - `aG` stands for 'add group'
-  - Hence, what the command is doing is adding the user `weehan` to the group `sudo`.
-  - users in the `sudo` group, also known as 'sudo users' or 'sudoers', are able to run privileged commands as the `root` user. Read more about it [here](https://www.linux.com/training-tutorials/linux-101-introduction-sudo/).
+
+- `usermod` stands for 'modify user'
+- `aG` stands for 'add group'
+- Hence, what the command is doing is adding the user `weehan` to the group `sudo`.
+- users in the `sudo` group, also known as 'sudo users' or 'sudoers', are able to run privileged commands as the `root` user. Read more about it [here](https://www.linux.com/training-tutorials/linux-101-introduction-sudo/).
 
 5. Switch to the newly created user.
+
 ```bash
 su weehan
 ```
-  - `su` is short for 'switch user'
+
+- `su` is short for 'switch user'
 
 6. Create a `.ssh` directory
+
 ```bash
 mkdir ~/.ssh
 ```
-  - `~` is a shorthand notation for your home directory, which is `/home/<username>`. In my case, it is `/home/weehan`. The command above hence creates the directory `/home/weehan/.ssh`
+
+- `~` is a shorthand notation for your home directory, which is `/home/<username>`. In my case, it is `/home/weehan`. The command above hence creates the directory `/home/weehan/.ssh`
 
 7. Create a file called `~/.ssh/authorized_keys`
+
 ```bash
 touch ~/.ssh/authorized_keys
 ```
@@ -185,11 +209,13 @@ touch ~/.ssh/authorized_keys
 8. Copy and paste the contents of your public key and paste it into `~/.ssh/authorized_keys`
 
 9. Exit the server
+
 ```bash
 exit
 ```
 
 10. SSH into the server as your username
+
 ```bash
 ssh weehan@161.35.59.43
 ```
@@ -197,6 +223,235 @@ ssh weehan@161.35.59.43
 11. Congrats on creating your first user!
 
 ## Install React, Rails and PostgreSQL
+
+_The following instructions are adapted from [this guide here](https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-ruby-on-rails-application-on-ubuntu-18-04), [this guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-ruby-on-rails-with-postgres) and [this website here](https://www.theodinproject.com)._
+
+For current CVWO members, you may choose to deploy your team's Rails app on your server, much like how you set up the app during the first week of CVWO.
+
+Otherwise, below are some steps that you can follow to get a simple Rails app with PostgreSQL up and running. There will be no React app deployed at this point.
+
+1. Install PostgreSQL
+
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib libpq-dev
+```
+
+The `postgresql` package holds the main PostgreSQL program, while `postgresql-contrib` adds several PostgreSQL features that extend its capabilities. `libpq-dev` is a PostgreSQL library that allows clients to send queries and receive responses from the back-end server, which will allow your application to communicate with its database.
+
+2. Creating a new database role
+
+Upon installation, PostgreSQL actually creates a user in your server called `postgres`. A role of the same name is created as well. For you to be able to operate within the PostgreSQL system, you will need to be using a user account that has a role of the same name.
+
+You can perform the following commands, replacing `weehan` with your just created user name.
+
+```bash
+sudo su postgres
+psql -c 'CREATE ROLE weehan WITH CREATEDB LOGIN;'
+psql -c 'ALTER USER weehan WITH SUPERUSER;'
+exit # switch back to your current user
+```
+
+> Note: We did not create a password for this role as of now. However, we can easily do so via
+>
+> ```bash
+> sudo su postgres
+> psql -c '\password weehan'
+> ```
+>
+> PostgreSQL will prompt you for a password, which you can key in. Do remember this password for later.
+
+3. Installing Rails
+
+There are a few ways to go about doing this. For this guide, we'll be using `rbenv`. The following commands can be done using your user account.
+
+```bash
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+```
+
+If you don't have `git` installed, you can run:
+
+```bash
+sudo apt update
+sudo apt install git
+```
+
+before running the command above again.
+
+Then you will need to add `rbenv` into your path:
+
+```bash
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+If the `source` command does not work for you, you may have to `exit` and `ssh` in again.
+
+Now let us install `ruby-build` to help compile the Ruby binaries.
+
+```bash
+mkdir -p "$(rbenv root)"/plugins
+git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+```
+
+Finally, run
+
+```bash
+rbenv -v
+```
+
+You should see some output for the first time, which looks similar to:
+
+```bash
+rbenv 1.1.2-2-g4e92322
+```
+
+Finally, we can do the following:
+
+```bash
+rbenv install 2.7.1 --verbose
+```
+
+As this installation will take quite a while, the `--verbose` flag helps us to make sure that the installation is still running.
+
+When it's done, run
+
+```bash
+rbenv global 2.7.1
+ruby -v
+```
+
+You should see the correct ruby version.
+
+Finally, let us run the following commands:
+
+```bash
+gem install rails
+gem install pg
+```
+
+4. Creating our Rails app
+
+Let us create an app now.
+
+```bash
+rails new appname -d=postgresql
+```
+
+This creates a new Rails app that uses PostgreSQL for its database.
+
+```bash
+cd appname
+```
+
+If you had previously configured a password for your account, and you wish to configure your database securely, you can do the following steps. Else, you can skip to the final [section 5](#rails-section-5).
+
+- Save your password as an environment variable that is loaded upon login.
+
+```bash
+echo 'export APPNAME_DATABASE_PASSWORD="your_password_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Next, you will need to update the `config/database.yml` file. Update the following section:
+
+```yml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # http://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: weehan
+  password: <%= ENV['APPNAME_DATABASE_PASSWORD'] %>
+```
+
+5. <div id="rails-section-5">Starting your Rails app</div>
+
+Let us start the app.
+
+```bash
+rails db:create
+rails db:migrate
+rails s -p 8080
+```
+
+This will create our databases and have our app running on port 8080!
+
+To test if your app is working, open up a new terminal tab or window, connect to your server using `ssh` and run:
+
+```bash
+curl http://127.0.0.1:8080
+```
+
+> 127.0.0.1 is the standard address for localhost. You can read more on [Wikipedia](https://en.wikipedia.org/wiki/Localhost).
+
+If you don't have `curl`, install it using:
+
+```bash
+sudo apt update
+sudo apt install curl
+```
+
+You should get some `html` response that ends with:
+
+```html
+        <strong>Ruby version:</strong> 2.7.1 (x86_64-linux)
+      </p>
+    </section>
+  </div>
+</body>
+</html>
+```
+
+6. Scaffolding and `screen` (Optional)
+
+Currently, our app will only have a single `html` page, which is the default home screen. We may want a more elaborate app. One way is to use some default scaffold, that will allow us to interact with our PostgreSQL database.
+
+```bash
+rails g scaffold Post title:string body:text
+rake db:migrate
+```
+
+If you face issues due to `yarn`, as some scaffolds use `webpacker`, which requires `yarn` to install it, we can set everything up using the following commands:
+
+```bash
+sudo curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+sudo sh -c "echo 'deb https://dl.yarnpkg.com/debian/ stable main' >> /etc/apt/sources.list"
+sudo apt update
+sudo apt install yarn # will install node and yarn together
+rails webpacker:install
+```
+
+If you wish to install Node separately, e.g. you want to install a specific version, the following commands can be used to install Node v12.18.1:
+
+```bash
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt-get update
+sudo apt-get install git-core zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev nodejs yarn
+```
+
+We can now CRUD posts via `http://127.0.0.1:8080/posts`.
+
+If you wish to run the rails server in the background, you can also use the `screen` command (credits to [Tan Jin](https://github.com/tjtanjin)).
+
+```bash
+screen
+rails s -p 8080
+```
+
+After the Rails server is up, detach yourself from the screen using <kbd>ctrl</kbd> + <kbd>a</kbd> + <kbd>d</kbd>.
+
+To return to the screen:
+
+```
+screen -r
+```
+
+To terminate the screen, while you're attached to it, press <kbd>ctrl</kbd> + <kbd>d</kbd>.
 
 ## Web Servers with Nginx
 
@@ -208,7 +463,7 @@ This is where **Web servers** come in. Web servers can add functionality between
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y nginx 
+sudo apt-get install -y nginx
 ```
 
 2. Become the `root` user.
@@ -216,6 +471,7 @@ sudo apt-get install -y nginx
 ```bash
 sudo su
 ```
+
 3. Create a new file at `/etc/nginx/sites-available/app.conf` with the following contents:
 
 ```nginx
@@ -226,7 +482,7 @@ upstream app {
 server {
     listen 80;
     listen [::]:80;
-    server_name 161.35.59.43
+    server_name 161.35.59.43;
 
     # Pass request on to application
     location / {
@@ -234,47 +490,53 @@ server {
     }
 }
 ```
+
 - There are 2 blocks of code. The first is an **upstream** block and the second is a **server** block.
 - The **upstream** block is a way to identify where your Application Server is running. In this case, our application is being served on `localhost:8080`. We have also given the name `app` to our upstream block.
 - The **server** block creates a server that listens on **port 80** of the IP address `161.35.59.43`, i.e. the droplet. Replace this with the IP address of your own droplet
 
-  - Port 80 is the default port for serving HTTP content. For example, when you connect to google.com, you are actually connecting to port 80 of google.com, i.e. google.com:80. 
+  - Port 80 is the default port for serving HTTP content. For example, when you connect to google.com, you are actually connecting to port 80 of google.com, i.e. google.com:80.
 
 - Within our server block, we have defined a **location** block with the path `/`.
-  - This means that for all queries that start with `/` (i.e. *all* queries in this case), it will be passed (known as **proxy passed**) to our upstream block.
+  - This means that for all queries that start with `/` (i.e. _all_ queries in this case), it will be passed (known as **proxy passed**) to our upstream block.
   - There can be multiple location blocks within a server block. If so, any incoming request will be passed to the **longest match path** as opposed to sequentially. Read more about [location matching here](https://www.keycdn.com/support/nginx-location-directive#:~:text=In%20case%20the%20longest%20matching,stored%20and%20the%20process%20continues.).
 
 4. Create a [soft link](https://www.geeksforgeeks.org/soft-hard-links-unixlinux/) from `/etc/nginx/sites-enabled/app.conf` to `/etc/nginx/sites-available/app.conf`
+
 ```bash
 ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/app.conf
 ```
 
 5. Restart nginx
+
 ```bash
 sudo systemctl restart nginx
 ```
 
 6. Run your application on `localhost:8080` on your droplet.
 
-7. Open your browser and key in your IP address (``161.35.59.43``) in the address bar. You should be able to see your application now. Congratulations!
+7. Open your browser and key in your IP address (`161.35.59.43`) in the address bar. You should be able to see your application now. Congratulations!
 
 ## DNS with Namecheap
 
 It's a lot easier for humans to remember words as compared to numbers. Hence, the [Domain Name System (DNS)](https://www.cloudflare.com/learning/dns/what-is-dns/) was created to map domain names to IP addresses on the internet. In this section, you will set up your own domain and link it to your DigitalOcean droplet, and in the process learn about DNS records.
 
 1. Sign up for a domain with [Namecheap](https://www.namecheap.com/). If you own domains under other domain providers (e.g Godaddy), the steps should be similar.
-  > **TIP**: If you are a student, you are eligible for a free domain ending in `.me` for a year from Namecheap under the [GitHub Student Developer pack](https://education.github.com/pack).
 
-2. Go to the Namecheap dashboard and click on 'Manage' next to the domain you purchased. For this tutorial, I  will be using a domain I own, `hello.com.de`.
+   > **TIP**: If you are a student, you are eligible for a free domain ending in `.me` for a year from Namecheap under the [GitHub Student Developer pack](https://education.github.com/pack).
+
+2. Go to the Namecheap dashboard and click on 'Manage' next to the domain you purchased. For this tutorial, I will be using a domain I own, `hello.com.de`.
 
 ![Alt text](./Namecheap-Dashboard.png?raw=true "DigitalOcean page")
 
 3. Go to the 'Advanced DNS' tab and add the following DNS Records.
+
 - Add an `A Record` from the `@` host to your DigitalOcean IP address. This will redirect all requests from hello.com.de to 161.35.59.43.
-  
+
   > A Records are the most important type of DNS records. They connect domain names to IP addresses.
-  
+
 - Add a `CNAME Record` from the `www` to your domain. This will redirect all requests from `www.hello.com.de` to `hello.com.de`
+
   > CNAME Records are used for aliasing, i.e. redirecting from one domain to another domain, or from a subdomain (like www) to a domain.
 
 - If you did the steps above correctly, they shoud look something like this. You may refer to [this guide](https://ap.www.namecheap.com/Domains/DomainControlPanel/hello.com.de/advancedns) for further clarification.
@@ -293,9 +555,11 @@ The HTTPS protocol is based on **Public Key Infrastructure (PKI)**, an extension
 
 In this section, we will be obtain a certificate for our domain and serve it using our Nginx web server, so our website will be secured with HTTPS.
 
-1. [Install Certbot](https://certbot.eff.org/all-instructions). 
-  - `Certbot` is a free command line tool for generating SSL certificates.
-  - The certificate we will be generating is provided by [`LetsEncrypt`](https://letsencrypt.org/), a non-profit CA.
+1. [Install Certbot](https://certbot.eff.org/all-instructions).
+
+- `Certbot` is a free command line tool for generating SSL certificates.
+- The certificate we will be generating is provided by [`LetsEncrypt`](https://letsencrypt.org/), a non-profit CA.
+
 2. Update nginx configuration in `/etc/nginx/sites-available/app.conf` to add an additional location block to the server.
 
 ```nginx
@@ -306,38 +570,43 @@ upstream app {
 server {
     listen 80;
     listen [::]:80;
-    server_name hello.com.de
+    server_name hello.com.de;
 
     # Path for certbot renewal
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
-  
+
     # Redirect to HTTPS
     location / {
         return 301 https://$host$request_uri;
     }
 }
 ```
-  - This additional block is used by Certbot for generating the certificate using the **Automatic Certificate Management Environment (ACME)** protocol, more specifically the **HTTP-01** Challenge. Read more about the ACME protocol [here](https://letsencrypt.org/docs/challenge-types/).
+
+- This additional block is used by Certbot for generating the certificate using the **Automatic Certificate Management Environment (ACME)** protocol, more specifically the **HTTP-01** Challenge. Read more about the ACME protocol [here](https://letsencrypt.org/docs/challenge-types/).
 
 3. Restart nginx
+
 ```bash
 sudo systemctl restart nginx
 ```
 
 4. Generate certificate for `hello.com.de`
+
 ```bash
 sudo certbot certonly -d hello.com.de
 ```
-  - The newly generated certificate will be stored in the directory `/etc/letsencrypt/live/hello.com.de/`. It should contain the following 4 files:
-    - `cert.pem`: The certificate itself
-    - `chain.pem`: Additional intermediate certificate(s) that web browers need to validate the certificate. See [chain of trust](https://www.youtube.com/watch?v=LPxeYtMDxl0).
-    - `fullchain.pem`: All certificates, i.e server certificate + additional intermediate certificates.
-    - `privkey.pem`: Private key for the certificate.
-  - For purposes of authentication, having both `fullchain.pem` and `privkey.pem` is sufficient. We will be serving these files using Nginx in the next step.
+
+- The newly generated certificate will be stored in the directory `/etc/letsencrypt/live/hello.com.de/`. It should contain the following 4 files:
+  - `cert.pem`: The certificate itself
+  - `chain.pem`: Additional intermediate certificate(s) that web browers need to validate the certificate. See [chain of trust](https://www.youtube.com/watch?v=LPxeYtMDxl0).
+  - `fullchain.pem`: All certificates, i.e server certificate + additional intermediate certificates.
+  - `privkey.pem`: Private key for the certificate.
+- For purposes of authentication, having both `fullchain.pem` and `privkey.pem` is sufficient. We will be serving these files using Nginx in the next step.
 
 5. Update nginx configuration again in `/etc/nginx/sites-available/app.conf`
+
 ```nginx
 upstream app {
     server localhost:8080;
@@ -346,23 +615,23 @@ upstream app {
 server {
     listen 80;
     listen [::]:80;
-    server_name hello.com.de
+    server_name hello.com.de;
 
     # Path for certbot renewal
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
-  
+
     # Redirect to HTTPS
     location / {
-        return 301 https://$host$request_uri;
+        return 301 https://$server_name$request_uri;
     }
 }
 
 server {
-    listen 443;
+    listen 443 ssl;
     listen [::]:443;
-    server_name hello.com.de
+    server_name hello.com.de;
 
     # Path for certbot renewal
     location /.well-known/acme-challenge/ {
@@ -401,21 +670,24 @@ server {
 	proxy_set_header X-Forwarded-Proto $scheme;
 	proxy_pass_request_headers on;
 
-  
+
     # Pass request on to application
     location / {
         proxy_pass http://app;
     }
 }
 ```
-  - A new server block listening at **port 443** is added.
-    - Port 443 is the default port for serving HTTPS content. For example, when you connect to https://www.google.com, you are actually connecting to port 443 of https://www.google.com, i.e. https://www.google.com:443. 
 
-  - The old server block listening at post 80 will now redirect to the https block with a status code of 301.
+- A new server block listening at **port 443** is added.
 
-  - Some additional headers related to SSL are added to the request before it is proxy passed to the upstream (i.e. the Application server).
+  - Port 443 is the default port for serving HTTPS content. For example, when you connect to <https://www.google.com>, you are actually connecting to port 443 of <https://www.google.com>, i.e. <https://www.google.com:443>.
+
+- The old server block listening at post 80 will now redirect to the https block with a status code of 301.
+
+- Some additional headers related to SSL are added to the request before it is proxy passed to the upstream (i.e. the Application server).
 
 6. Restart nginx
+
 ```bash
 sudo systemctl restart nginx
 ```
