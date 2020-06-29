@@ -694,21 +694,388 @@ sudo systemctl restart nginx
 
 7. If you open your webpage now, your website should now be served securely over HTTPS. You should see a green lock when accessing your website. Good work!
 
-## Shell Scripting with Bash
-
-> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=_n5ZegzieSQ) for the time being on getting started with shell scripting.
-
 ## Remote Storage with AWS S3 Buckets
 
-> This is a work in progress. Refer to [this guide](https://aws.amazon.com/getting-started/hands-on/backup-to-s3-cli/) for the time being on how to use the AWS CLI.
+Data backups are important and often necessary for saving important files in case there is ever a system crash or hard drive failure. Amazon Web Services (AWS) is a cloud computing platform which provides cloud services such as VMs (EC2), storage (S3) and container orchestration (EKS). In this section, we will explore using Simple Storage Service, or S3, for remote backups.
+
+Amazon S3 uses object storage, and the fundamental unit of object storage is a bucket. Conceptually, you can think of a bucket as a folder that you can store files and subdirectories in. However, they are fundamentally different from file storage that you are probably are familiar with. You can read more about it [here](https://www.redhat.com/en/topics/data-storage/file-block-object-storage#:~:text=File%20storage%20organizes%20and%20represents,links%20it%20to%20associated%20metadata.). 
+
+
+1. Create an AWS account.
+  > Newly created accounts are granted 1 year of [AWS free tier](https://aws.amazon.com/free/?all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc) to try out various cloud services for free. For S3, this includes 5 GB of standard storage.
+
+2. Go to the [AWS console](console.aws.amazon.com), login to your account and navigate to the [IAM users page](https://console.aws.amazon.com/iam/home#/users).
+  > IAM stands for Identity and Access Management.
+
+3. Click on **Add user**, and create an IAM user with S3 permissions
+
+- Under **Access type**, select **Programmatic access**
+- Under **Set permissions**, click on **Attach existing policies directly**.
+- Search for **AmazonS3FullAccess** and select it. This will give the user permissions to CRUD S3 buckets.
+
+  ![Alt text](./attach-existing-policies-directly.png?raw=true "Cron format")
+- Proceed to create the user. Upon doing so, you will be redirected to a page where you can see the `Access key ID` and `Secret access key` of the user. Copy these values somewhere - we'll be using it in later steps.
+
+  ![Alt text](./add-user-success.png?raw=true "Cron format")
+
+4. SSH into your droplet and install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html), a command line interface for interacting with AWS services.
+
+    ```bash
+    sudo apt-get install awscli -y
+    ```
+
+5. Configure the AWS CLI by running the following command. 
+    ```bash
+    aws configure
+    ```
+
+  - You will be prompted for your `Access key ID` and `Secret access key` which you generated earlier, as well as some other information. You can use this configuration:
+
+    ```bash
+    AWS Access Key ID [None]: AKIATLIGLWLFJMPE46WT
+    AWS Secret Access Key [None]: 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
+    Default region name [None]: ap-southeast-1	
+    Default output format [None]: json
+    ```
+
+    - `ap-southeast-1` refers to Singapore.
+    - Your configurations and credentials are stored in `~/.aws/config` and `~/.aws/credentials` respectively. If you mistyped something or want to make changes, you can modify these files.
+
+6. Create the S3 bucket. The bucket can have any name, but it has to be globally unique. I named mine `weehan-s3-bucket`.
+
+    ```bash
+    aws s3 mb s3://weehan-s3-bucket
+    ```
+    - `mb` stands for `make bucket`
+
+    - To verify that the bucket was created, you should be able to see your bucket when you run the following command:
+
+    ```bash
+    aws s3 ls
+    ```
+
+7. Transfer a file from your droplet to the S3 bucket.
+
+  - Create a file called `myfile.txt` with contents "`Hello World`".
+    ```bash
+    echo "Hello World" > ~/myfile.txt
+    ```
+
+  - Transfer the file to the S3 bucket.
+    ```bash
+    aws s3 cp ~/myfile.txt s3://weehan-s3-bucket/
+    ```
+
+  - Check that the file is in the bucket by listing its contents.
+    ```bash
+    aws s3 ls s3://weehan-s3-bucket/
+    ```
+    - Note that the `/` at the end of the bucket name is required.
+
+8. Transfer the file from the s3 bucket to your droplet.
+
+  - Delete the file on your droplet.
+    ```bash
+    rm ~/myfile.txt
+    ```
+
+  - Transfer the file from S3 storage back to your droplet.
+    ```bash
+    aws s3 cp s3://weehan-s3-bucket/myfile.txt ~/
+    ```
+
+  - Verify that the file is there.
+    ```bash
+    cat ~/myfile.txt
+    ```
+    - Output should be "Hello World"
+
+  - Delete the file in the s3 bucket
+    ```bash
+    aws s3 rm s3://weehan-s3-bucket/myfile.txt
+    ```
+
+9. Congrats on successfully setting up and transferring files to your S3 bucket!
 
 ## Backups with Cron jobs
 
 > This is a work in progress. Refer to [this guide](https://www.ostechnix.com/a-beginners-guide-to-cron-jobs/) for the time being on getting started with Cron jobs.
 
-## Systemd services
+**Cron** is one of the most useful utility that you can find in any Unix-like operating system. It is used to schedule commands at a specific time. These scheduled commands or tasks are known as “Cron Jobs”.
 
-> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=fYQBvjYQ63U) for the time being on getting started with systemd services.
+Cron is generally used for running scheduled backups, monitoring disk space, deleting files (for example log files) periodically which are no longer required, running system maintenance tasks, and a lot more. In this section, we will be writing a short script to generate a log file and store it in our AWS S3 bucket everyday.
+
+1. Create a directory to store the backups
+```bash
+mkdir ~/backups
+```
+
+2. Create a file called `~/backup.sh` with the following contents.
+
+```bash
+# Directory for backups.
+BACKUP_DIR="~/backup"
+
+# Backup file to be in the format "DD-MM-YYYY-log.txt".
+FILENAME="$(date +'%d-%m-%y')-log.txt"
+
+# Set backup path
+BACKUP_FILE_PATH="$BACKUP_DIR/$FILENAME"
+
+# Save the stuff you want to save into this backup file.
+# In this example, we will dump the contents of our postgres database.
+pg_dump > $BACKUP_FILE_PATH
+
+# Transfer the file into the AWS Bucket
+aws s3 cp $BACKUP_FILE_PATH s3://weehan-s3-bucket/
+```
+
+3. Make the file an executable
+
+```bash
+chmod +x ~/backup.sh
+```
+
+4. Cron jobs are managed using a special file known as `crontab`. You can modify your crontab by running the following command, which will open up the crontab file in your default text editor.
+
+```bash
+crontab -e
+```
+
+5. Each line in the crontab represents a cron job, and follows the following format:
+
+![Alt text](./cron-format.png?raw=true "Cron format")
+
+- For example, if I want to schedule a backup to run the `~/backup.sh` file at 6:15am every weekday, I would add the following line to my crontab.
+```
+15 6 * * 1-5 ~/backup.sh
+```
+
+6. After modifying your crontab, you can display the contents of your crontab file by running:
+```bash
+crontab -l
+```
+
+7. Congratulations, you have successfully setup a crontab to make daily file backups to AWS!
+
+
+## Systemd Services
+
+Systemd is a software suite that provides an array of system components for Linux operating systems. In this section, we will be writing our own custom systemd services to manage our rails application and backups.
+
+1. Create a file called `/etc/systemd/system/myapp.service`, with the following contents
+
+```bash
+[Unit]
+Description=Rails Server
+After=network.target
+# Rails application requires postgreSQL service to be running
+After=postgresql.service
+Requires=postgresql.service
+# Rails application 'wants' nginx to be running, but is not a requirement
+Wants=nginx.service
+
+[Service]
+# Replace the following configurations with the path to your application
+Type=simple
+User=weehan
+WorkingDirectory=/home/weehan/path/to/rails/application/
+ExecStart=/home/weehan/.rbenv/bin/rbenv exec bundle exec puma -C /home/weehan/path/to/rails/application/config/puma/production.rb
+ExecStop=/home/weehan/.rbenv/bin/rbenv exec bundle exec pumactl -S //home/weehan/path/to/rails/application/shared/tmp/pids/server.state stop
+PIDFile=/home/weehan/path/to/rails/application/shared/tmp/pids/puma.state
+TimeoutSec=15
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+2. To start the service, run
+```bash
+sudo systemctl start myapp
+```
+  - This commmand will execute the command specified in `ExecStart`, which in this case will start the rails application.
+  - To check the status of the service, you can run
+
+```bash
+systemctl status myapp
+```
+
+3. To stop the service, run 
+```bash
+sudo systemctl stop myapp
+```
+  - This commmand will execute the command specified in `ExecStop`, which in this case will stop the rails application.
+
+4. To enable the service to start whenever you restart, run
+```bash
+sudo systemctl enable myapp
+```
+  - This commmand will execute the command specified in `ExecStart`, whenever the system is rebooted, to ensure that the application is always running.
+
+5. To facilitate the backing up of data, we will create a service for it. Create a file called `/etc/systemd/system/backup.service` with the following contents:
+
+```bash
+[Unit]
+Description=Backup
+Requires=postgresql.service
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=weehan
+WorkingDirectory=/home/weehan
+ExecStart=/home/weehan/backup.sh
+
+[Install]
+WantedBy=multi-user.target
+```
+
+6. Create a file called `/etc/systemd/system/backup.timer`, with the following contents:
+```bash
+[Unit]
+Description=Run backup for Rails application daily
+Requires=postgresql.service
+After=postgresql.service
+
+[Timer]
+OnCalendar=06:15
+Persistent=true
+WakeSystem=true 
+
+[Install]
+WantedBy=timers.target
+```
+
+7. Enable the backup timer to run
+
+```bash
+sudo systemctl start backup.timer
+```
+
+8. Congratulations on setting up your very own custom systemd services!
+
+## Shell Scripting with Bash
+
+> This is a work in progress. Refer to [this video tutorial](https://www.youtube.com/watch?v=_n5ZegzieSQ) for the time being on getting started with shell scripting.
+
+At this juncture, you are probably already familiar with basic shell commands e.g. `ls`, `cd`, `rm`, `mkdir`, `cat`. However, sometimes you may need to do more than just these basic shell commands. For example, if you were asked to create 1000 folders with names `folder1`, `folder2`, ..., `folder1000`, how would you do it? Sure, you could just create the folders manually. But if you were familiar with shell scripting, you could just do it in a single line:
+
+```bash
+for i in $(seq 1 1000); do mkdir "folder$i"; done
+```
+
+For anything more complicated than basic shell commands, shell scripting becomes extremely useful and often times even necessary. It is hence one of the essential skills a unix programmer should have.
+
+### Environment variables
+
+1.  **PATH**
+
+    The `$PATH` variable is perhaps the most commonly used environment variable, even if you don't realise it.
+
+### Conditional statements
+
+1. **If-elif-else statements**
+
+```bash
+if [ true ]; then             # Take note of the semicolon after the condition
+  echo "this is true"
+elif [ true ]; then
+  echo "this is also true"
+else                          # Else block does not have a 'then'
+  echo "this is false"
+fi                            # inverse of if 
+```
+
+2. **Boolean expressions**
+
+`and (&&)`, `or (||)` and `not (!)`
+
+`and`:
+```bash
+if [ $x == true -a $x == true ]; then
+fi
+
+if [  ] && [  ]; then
+fi
+
+if [[  ]]; then
+fi
+```
+
+`or`:
+```bash
+if [ $x == 1 -o $y == 2 ]; then
+fi
+
+if [ $x -eq 1 ] || [ $y -eq 2 ]; then
+fi
+
+if [[  ]]; then
+fi
+```
+
+3. **Case statements**
+
+This is also known as switch-case statements in other languages.
+
+```bash
+ANIMAL=CAT
+case $ANIMAL in
+  DOG)
+    echo "Woof"
+    ;;
+  CAT)
+    echo "Meow"
+    ;;
+  *)
+    echo "Rawr"
+    ;;
+esac # inverse of case
+```
+
+### Controls statements
+
+1. **For loops**
+  ```bash
+  for i in $(seq 1 10); do
+    echo "hello world";
+  done
+  ```
+
+2. **While loops**
+  ```bash
+  while :; do
+    echo "hello world";
+  done
+  ```
+
+### Functions
+```bash
+function mkcd() {
+  mkdir $1;
+  cd $1;
+}
+```
+
+### I/O
+
+1. `stdin`
+
+2. `stdout`
+
+3. `stderr`
+
+4. Unix pipes
+
+5. `/dev/null`
+
+### Other useful stuff
+
+2. `sed`
+
+3. `awk`
+
 
 ## CI/CD with GitLab CI
 
